@@ -13,6 +13,8 @@ import {
 import { ProductsService } from './products.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { IpWhitelistGuard } from 'src/ip-whitelist/ip-whitelist.guard';
+import { IpWhitelistInterceptor } from 'src/ip-whitelist/ip-whitelist.interceptor';
 
 @Controller('products')
 export class ProductsController {
@@ -21,6 +23,8 @@ export class ProductsController {
   @Post()
   @UseInterceptors(FileInterceptor('image'))
   @UseGuards(JwtAuthGuard)
+  // @UseGuards(IpWhitelistGuard)
+  @UseInterceptors(IpWhitelistInterceptor)
   async createProduct(
     @Body('name') name: string,
     @Body('description') description: string,
