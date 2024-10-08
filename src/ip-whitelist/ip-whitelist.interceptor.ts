@@ -10,7 +10,7 @@ import { Request } from 'express';
 
 @Injectable()
 export class IpWhitelistInterceptor implements NestInterceptor {
-  private allowedIps = ['127.0.0.12', '192.168.1.110'];
+  private allowedIps = ['127.0.0.1', '192.168.1.110'];
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request: Request = context.switchToHttp().getRequest();

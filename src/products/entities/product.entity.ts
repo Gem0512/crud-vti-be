@@ -1,19 +1,19 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Schema()
-export class Product extends Document {
-  @Prop({ required: true })
+@Entity()
+export class Product {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
   name: string;
 
-  @Prop({ required: true })
+  @Column()
   description: string;
 
-  @Prop({ required: true })
+  @Column('decimal')
   price: number;
 
-  @Prop()
+  @Column({ nullable: true })
   imageUrl: string;
 }
-
-export const ProductSchema = SchemaFactory.createForClass(Product);

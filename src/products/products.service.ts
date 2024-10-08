@@ -1,13 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
-import { Model } from 'mongoose';
+import { Repository } from 'typeorm';
 import cloudinary from 'src/cloudinary.config';
 
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectModel(Product.name) private readonly productModel: Model<Product>,
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
   ) {}
 
   async createProduct(
@@ -18,22 +19,23 @@ export class ProductsService {
   ): Promise<Product> {
     const uploadResult = await cloudinary.uploader.upload(image.path);
 
-    const newProduct = new this.productModel({
+    const newProduct = this.productRepository.create({
       name,
       description,
       price,
       imageUrl: uploadResult.secure_url,
     });
 
-    return newProduct.save();
+    return this.productRepository.save(newProduct);
   }
 
   async getAllProducts(): Promise<Product[]> {
-    return this.productModel.find().exec();
+    return this.productRepository.find();
   }
 
   async getProductById(productId: string): Promise<Product> {
-    const product = await this.productModel.findById(productId).exec();
+    const id = parseInt(productId, 10); // Chuyển đổi từ chuỗi sang số
+    const product = await this.productRepository.findOne({ where: { id } });
     if (!product) {
       throw new NotFoundException(`Product with ID ${productId} not found`);
     }
@@ -58,12 +60,12 @@ export class ProductsService {
     product.description = description;
     product.price = price;
 
-    return product.save();
+    return this.productRepository.save(product);
   }
 
   async deleteProduct(productId: string): Promise<void> {
-    const result = await this.productModel.deleteOne({ _id: productId }).exec();
-    if (result.deletedCount === 0) {
+    const result = await this.productRepository.delete(productId);
+    if (result.affected === 0) {
       throw new NotFoundException(`Product with ID ${productId} not found`);
     }
   }

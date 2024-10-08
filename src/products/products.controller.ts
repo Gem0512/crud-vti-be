@@ -24,7 +24,7 @@ export class ProductsController {
   @UseInterceptors(FileInterceptor('image'))
   @UseGuards(JwtAuthGuard)
   // @UseGuards(IpWhitelistGuard)
-  @UseInterceptors(IpWhitelistInterceptor)
+  // @UseInterceptors(IpWhitelistInterceptor)
   async createProduct(
     @Body('name') name: string,
     @Body('description') description: string,

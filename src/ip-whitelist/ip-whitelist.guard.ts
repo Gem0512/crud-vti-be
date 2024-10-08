@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 import { Request } from 'express';
 
 @Injectable()
-export class IpWhitelistGuard {
+export class IpWhitelistGuard implements CanActivate {
   private allowedIps = ['127.0.0.1', '192.168.1.110'];
 
   canActivate(

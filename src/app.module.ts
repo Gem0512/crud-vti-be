@@ -1,16 +1,22 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { AppController } from './app.controller';
-import { UsersController } from './users/users.controller';
-import { AppService } from './app.service';
-import { UsersService } from './users/users.service';
+
 import { ProductsModule } from './products/products.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://127.0.0.1:27017/product'),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'products',
+      port: 5432,
+      username: 'postgres',
+      password: '1234',
+      database: 'products',
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true,
+    }),
     UsersModule,
     AuthModule,
     ProductsModule,

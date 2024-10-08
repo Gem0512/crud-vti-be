@@ -1,30 +1,29 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
-export type UserDocument = User & Document;
-
-@Schema()
+@Entity()
 export class User {
-  @Prop({ required: true })
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ unique: true })
   name: string;
 
-  @Prop({ required: true, unique: true })
+  @Column()
   password: string;
 
-  @Prop({ required: true, default: 'user' })
+  @Column({ default: 'user' })
   role: string;
 
+  // Method to compare passwords
   async comparePassword(enteredPassword: string): Promise<boolean> {
     return bcrypt.compare(enteredPassword, this.password);
   }
+
+  // Hash password before saving user
+  @BeforeInsert()
+  async hashPassword() {
+    const salt = await bcrypt.genSalt();
+    this.password = await bcrypt.hash(this.password, salt);
+  }
 }
-
-export const UserSchema = SchemaFactory.createForClass(User);
-
-UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-  const salt = await bcrypt.genSalt();
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
